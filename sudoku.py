@@ -1,5 +1,7 @@
 from tkinter import *
 import random as rand
+import time
+import _thread
 
 board = Tk()
 board.title("Sudoku")
@@ -8,7 +10,21 @@ board.geometry("900x900")
 with open("sudoku.csv") as i :
     a = i.readlines()
 game_solution =[x.split(",") for x in a]
-    
+hints = 3
+lives = 3
+mode = "Marker"
+numbers = ["1","2","3","4","5","6","7","8","9"]
+
+### add timer
+### add winning screen
+### add arrow keys control
+### top 10 times // leaderboards
+### difficulties
+### menu screen
+
+
+
+
 
 class Square:
     def __init__(self, rectangle):
@@ -29,10 +45,10 @@ class Square:
     def set_coords(self, row, column):
             self.row = row
             self.column = column
-hints = 3
-lives = 3
-mode = "Marker"
-numbers = ["1","2","3","4","5","6","7","8","9"]
+            
+            
+            
+
 def key_pressed(event):
     global current_square , canvas, numbers, mode, lives
     kp = event.char
@@ -164,6 +180,8 @@ def sink(button):
         
 def draw_board():
     global game_solution, game_number, lives
+    
+    _thread.start_new_thread(update,())
     lives = 3
     hints = 3
     game = game_solution[game_number][0]
@@ -188,14 +206,28 @@ game_number = rand.randint(0,71)
 canvas = Canvas(board, bg = "gray63", width = 810, height = 810)
 canvas.grid(row=0, column=0, columnspan=9, rowspan=9)
 board.bind("<Key>", key_pressed)
+
+
+# Buttons / Label
 marker_button = Button(board, text = "Marker", relief = SUNKEN, command=lambda : [sink("Marker"),mode_change("Marker")])
 pencil_button = Button(board, text = "Pencil", command=lambda : [sink("Pencil"),mode_change("Pencil")])
 hint_button = Button(board, text = "Get hint " + str(hints), command = lambda : get_hint())
 life_lable = Label(board, text = "Lives: " + str(lives))
+# Button placement
 marker_button.grid(row = 10, column = 0, sticky = (N,E,S,W))
 pencil_button.grid(row = 10, column = 1, sticky = (N,E,S,W))
 hint_button.grid(row = 10, column = 2, sticky = (N,E,S,W))
 life_lable.grid(row = 10, column = 3, sticky = (N,E,S,W))
+
+time_lable = Label(board, text = "0")
+time_lable.grid(row = 10, column = 4, sticky = (N,E,S,W))
+def update():
+    global time_lable
+    while True:
+        time_elapsed = time.time()-start_time
+        minutes = time_elapsed // 60
+        seconds = time_elapsed%60
+        time_lable.config(text = "Time elapsed: "+ str(int(minutes))+ " mintues "+str(int(seconds)) + " seconds")
 
 grid = [[]for i in range(9)]
 for j in range(9):
@@ -208,7 +240,7 @@ for i in range(2):
     canvas.create_line(270+(i*270), 0, 270+(i*270), 900, fill="black", width=3)
     canvas.create_line(0, 270+(i*270), 900, 270+(i*270), fill="black", width=3)
     
-
+start_time = time.time()
 draw_board()
 
 board.mainloop()
