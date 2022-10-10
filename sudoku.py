@@ -5,7 +5,7 @@ import _thread
 
 board = Tk()
 board.title("Sudoku")
-board.geometry("900x900")
+board.geometry("700x700")
 
 with open("sudoku.csv") as i :
     a = i.readlines()
